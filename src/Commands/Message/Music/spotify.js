@@ -110,7 +110,20 @@ export default {
       }
 
       if (result.type === "PLAYLIST") {
-        for (let track of result.tracks) player.queue.add(track);
+        for (let track of result.tracks) {
+          player.queue.add(track);
+        }
+
+        const playlistName =
+          result.playlist?.name ||
+          result.tracks[0]?.playlist?.name ||
+          "Spotify Playlist";
+
+        const playlistUrl =
+          result.playlist?.url ||
+          result.tracks[0]?.playlist?.url ||
+          query;
+
         await message.reply({
           embeds: [
             new EmbedBuilder()
@@ -120,7 +133,7 @@ export default {
                 iconURL: message.author.displayAvatarURL({ dynamic: true }),
               })
               .setDescription(
-                `📜 **Menambahkan \`${result.tracks.length}\` lagu dari playlist:**\n🎶 **[${result.playlist.name}](${result.playlist.url})**`
+                `📜 **Menambahkan \`${result.tracks.length}\` lagu dari playlist:**\n🎶 **[${playlistName}](${playlistUrl})**`
               ),
           ],
         });
