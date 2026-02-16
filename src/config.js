@@ -1,8 +1,8 @@
 export default {
   TOKEN:
-    "MTQ3MjYxNTM0NTQwMjU0NDEzOA.GNAmY0.z_3i6KgNUHTbdSZF3gGo9hR1VSjQ5zpEUYw108",
+    "TOKEN_BOT_DISCORD_LU",
   MONGO:
-    "mongodb+srv://pplgsigma:pplgzone123@cluster0.o7x1oob.mongodb.net/?appName=Cluster0",
+    "AMBIL_URL_MONGODB_LU",
   OWNER: ["1186985440759267351"],
   PREFIX: "p!",
   COLOR: "#000000",
