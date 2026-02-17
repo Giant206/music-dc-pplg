@@ -58,7 +58,7 @@ export default {
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
           .setCustomId("autoplay")
-          .setLabel(newState ? "Matikan" : "Aktifkan")
+          .setLabel(newState ? "Menu" : "Menu")
           .setStyle(
             newState ? ButtonStyle.Danger : ButtonStyle.Success
           )
