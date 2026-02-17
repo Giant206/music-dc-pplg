@@ -1,4 +1,9 @@
-import { EmbedBuilder, ButtonBuilder, ActionRowBuilder } from "discord.js";
+import {
+  EmbedBuilder,
+  ButtonBuilder,
+  ActionRowBuilder,
+  ButtonStyle,
+} from "discord.js";
 
 export default {
   name: "play",
@@ -6,35 +11,31 @@ export default {
   category: "Music",
   permission: "",
   desc: "🎶 Mulailah memainkan lagu-lagu favoritmu!",
+
   options: {
     owner: false,
     inVc: true,
     sameVc: false,
-    player: {
-      playing: false,
-      active: false,
-    },
+    player: { playing: false, active: false },
     premium: false,
     vote: false,
   },
 
   run: async ({ client, message, args, ServerData }) => {
-    let prefix = ServerData.prefix;
+
+    const prefix = ServerData.prefix || client.settings.PREFIX;
+
     const query = args.join(" ");
 
     if (!query) {
-      const embed = new EmbedBuilder()
-        .setColor(client.settings.COLOR)
-        .setAuthor({
-          name: message.author.username,
-          iconURL: message.author.displayAvatarURL({ dynamic: true }),
-        })
-        .setDescription(
-          `❌ **Anda tidak memberikan lagu!**\nGunakan **\`${prefix}play <song/url>\`** untuk melanjutkan.`
-        );
-
-      return message.reply({ embeds: [embed] }).then((msg) => {
-        setTimeout(() => msg.delete(), 15000);
+      return message.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setColor(client.settings.COLOR)
+            .setDescription(
+              `❌ Anda tidak memberikan lagu!\nGunakan \`${prefix}play <song/url>\``
+            ),
+        ],
       });
     }
 
@@ -48,11 +49,11 @@ export default {
     });
 
     try {
-      const msg = await message.channel.send({
+      const loadingMsg = await message.channel.send({
         embeds: [
           new EmbedBuilder()
             .setColor(client.settings.COLOR)
-            .setDescription(`🔍 **Mencari lagu Anda...**`),
+            .setDescription("🔍 Mencari lagu Anda..."),
         ],
       });
 
@@ -60,57 +61,83 @@ export default {
         requester: message.author,
       });
 
-      if (!result.tracks.length) {
-        const embed = new EmbedBuilder()
-          .setColor("#FF0000")
-          .setDescription(`❌ **Tidak ada hasil ditemukan untuk query Anda!**`);
-        return msg.edit({ embeds: [embed] });
+      if (!result || !result.tracks.length) {
+        return loadingMsg.edit({
+          embeds: [
+            new EmbedBuilder()
+              .setColor("#FF0000")
+              .setDescription("❌ Tidak ada hasil ditemukan!"),
+          ],
+        });
       }
 
       if (result.type === "PLAYLIST") {
-        for (let track of result.tracks) player.queue.add(track);
-        const embed = new EmbedBuilder()
-          .setColor(client.settings.COLOR)
-          .setAuthor({
-            name: message.author.username,
-            iconURL: message.author.displayAvatarURL({ dynamic: true }),
-          })
-          .setDescription(
-            `🎵 **Ditambahkan ke Antrian:** [${result.tracks[0].title}](${result.tracks[0].uri})\n👤 **Artis:** ${result.tracks[0].author}\n📂 **Playlist:** [${result.playlist.name}](${result.playlist.uri})\n📊 **Jumlah Lagu:** ${result.tracks.length}`
-          );
-        return msg.edit({ embeds: [embed] });
-      } else {
-        player.queue.add(result.tracks[0]);
-        if (!player.playing && !player.paused) player.play();
 
-        const embed = new EmbedBuilder()
-          .setColor(client.settings.COLOR)
-          .setAuthor({
-            name: message.author.username,
-            iconURL: message.author.displayAvatarURL({ dynamic: true }),
-          })
-          .setDescription(
-            `🎵 **Ditambahkan ke Antrian:** [${result.tracks[0].title}](${result.tracks[0].uri})\n👤 **Artis:** ${result.tracks[0].author}`
-          );
+        for (const track of result.tracks)
+          player.queue.add(track);
 
-        const row = new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setLabel("🎧 Dengarkan Sekarang")
-            .setURL(result.tracks[0].uri)
-            .setStyle(5)
-        );
+        if (!player.playing) player.play();
 
-        return msg.edit({ embeds: [embed], components: [row] });
+        const playlistName =
+          result.playlist?.name || "Playlist";
+
+        const playlistUrl =
+          result.playlist?.uri || result.tracks[0].uri;
+
+        return loadingMsg.edit({
+          embeds: [
+            new EmbedBuilder()
+              .setColor(client.settings.COLOR)
+              .setDescription(
+                `📂 Playlist ditambahkan!\n` +
+                `**${playlistName}**\n` +
+                `Jumlah lagu: **${result.tracks.length}**`
+              ),
+          ],
+          components: [
+            new ActionRowBuilder().addComponents(
+              new ButtonBuilder()
+                .setLabel("Buka Playlist")
+                .setURL(playlistUrl)
+                .setStyle(ButtonStyle.Link)
+            ),
+          ],
+        });
       }
+
+      const track = result.tracks[0];
+      player.queue.add(track);
+
+      if (!player.playing && !player.paused)
+        player.play();
+
+      return loadingMsg.edit({
+        embeds: [
+          new EmbedBuilder()
+            .setColor(client.settings.COLOR)
+            .setDescription(
+              `🎵 Ditambahkan:\n[${track.title}](${track.uri})\n` +
+              `👤 ${track.author}`
+            ),
+        ],
+        components: [
+          new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setLabel("🎧 Dengarkan")
+              .setURL(track.uri)
+              .setStyle(ButtonStyle.Link)
+          ),
+        ],
+      });
+
     } catch (err) {
       console.error(err);
+
       message.channel.send({
         embeds: [
           new EmbedBuilder()
             .setColor("#FF0000")
-            .setDescription(
-              `❌ **Terjadi kesalahan saat mengambil lagu!**`
-            ),
+            .setDescription("❌ Terjadi error saat memutar lagu"),
         ],
       });
     }
