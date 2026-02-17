@@ -398,93 +398,60 @@ export default async (client, interaction) => {
     }
     //autoplay
     else if (interaction.customId === "autoplay") {
-      if (!player) return interaction.message.delete();
+    if (!player) return interaction.message.delete();
 
-      if (
-        !interaction.member.voice.channelId &&
-        interaction.user.id !== client.user.id &&
-        interaction.user.id !== client.settings.owner
-      )
-        return interaction.reply({ embeds: [notInvc], ephemeral: true });
-      if (
-        interaction.member.voice.channelId !== player.voiceId &&
-        interaction.user.id !== client.user.id &&
-        interaction.user.id !== client.settings.owner
-      )
-        return interaction.reply({ embeds: [samevc], ephemeral: true });
-      if (
-        interaction.user.id !== player.queue.current.requester.id &&
-        interaction.user.id !== client.settings.owner
-      )
-        return interaction.reply({ embeds: [requesterEmebd], ephemeral: true });
-      if (player.data.get("autoplay", true)) {
-        player.data.set("autoplay", false);
-      } else {
-        player.data.set("autoplay", true);
-      }
-      const settingRow = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId("autoplay")
-          .setEmoji(`1177656039227793468`)
-          .setStyle(
-            player.data.get("autoplay")
-              ? ButtonStyle.Success
-              : ButtonStyle.Secondary
-          )
-          .setLabel(
-            "Autoplay - " +
-              `${player.data.get("autoplay", true) ? "Enabled" : "Disabled"}`
-          ),
-        new ButtonBuilder()
-          .setCustomId("loop")
-          .setEmoji(`1177292642590142494`)
-          .setStyle(ButtonStyle.Secondary)
-          .setEmoji(`1177292642590142494`)
-          .setLabel(
-            `Loop - ${
-              player.loop == "none"
-                ? "Off"
-                : player.loop == "track"
-                ? "Track"
-                : "Queue"
-            }`
-          ),
-        new ButtonBuilder()
-          .setCustomId("volume")
-          .setStyle(ButtonStyle.Secondary)
-          .setLabel("Volume")
-      );
-      interaction.update({ components: [settingRow], ephemeral: true });
-    } else if (interaction.customId === "volume") {
-      if (!player) return interaction.message.delete();
-      if (
-        !interaction.member.voice.channelId &&
-        interaction.user.id !== client.user.id &&
-        interaction.user.id !== client.settings.owner
-      )
-        return interaction.reply({ embeds: [notInvc], ephemeral: true });
-      if (
-        interaction.member.voice.channelId !== player.voiceId &&
-        interaction.user.id !== client.user.id &&
-        interaction.user.id !== client.settings.owner
-      )
-        return interaction.reply({ embeds: [samevc], ephemeral: true });
-      if (
-        interaction.user.id !== player.queue.current.requester.id &&
-        interaction.user.id !== client.settings.owner
-      )
-        return interaction.reply({ embeds: [requesterEmebd], ephemeral: true });
-      const volumeRw = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId("inc")
-          .setStyle(ButtonStyle.Success)
-          .setLabel("Increase"),
-        new ButtonBuilder()
-          .setCustomId("dec")
-          .setStyle(ButtonStyle.Success)
-          .setLabel("Decrease")
-      );
-      return interaction.reply({ components: [volumeRw], ephemeral: true });
+    if (
+      !interaction.member.voice.channelId &&
+      interaction.user.id !== client.user.id &&
+      interaction.user.id !== client.settings.owner
+    )
+      return interaction.reply({ embeds: [notInvc], ephemeral: true });
+
+    if (
+      interaction.member.voice.channelId !== player.voiceId &&
+      interaction.user.id !== client.user.id &&
+      interaction.user.id !== client.settings.owner
+    )
+      return interaction.reply({ embeds: [samevc], ephemeral: true });
+
+    if (
+      interaction.user.id !== player.queue.current.requester.id &&
+      interaction.user.id !== client.settings.owner
+    )
+      return interaction.reply({ embeds: [requesterEmebd], ephemeral: true });
+
+    const current = player.data.get("autoplay") ?? false;
+    const newState = !current;
+    player.data.set("autoplay", newState);
+
+    const settingRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("autoplay")
+        .setEmoji(`1177656039227793468`)
+        .setStyle(newState ? ButtonStyle.Success : ButtonStyle.Secondary)
+        .setLabel(`Autoplay - ${newState ? "Enabled" : "Disabled"}`),
+
+      new ButtonBuilder()
+        .setCustomId("loop")
+        .setEmoji(`1177292642590142494`)
+        .setStyle(ButtonStyle.Secondary)
+        .setLabel(
+          `Loop - ${
+            player.loop == "none"
+              ? "Off"
+              : player.loop == "track"
+              ? "Track"
+              : "Queue"
+          }`
+        ),
+
+      new ButtonBuilder()
+        .setCustomId("volume")
+        .setStyle(ButtonStyle.Secondary)
+        .setLabel("Volume")
+    );
+
+    return interaction.update({ components: [settingRow] });
     } else if (interaction.customId === "inc") {
       if (!player) return interaction.message.delete();
       if (

@@ -1,4 +1,9 @@
-import { EmbedBuilder, ButtonBuilder, ActionRowBuilder } from "discord.js";
+import {
+  EmbedBuilder,
+  ButtonBuilder,
+  ActionRowBuilder,
+  ButtonStyle,
+} from "discord.js";
 
 export default {
   name: "autoplay",
@@ -17,13 +22,14 @@ export default {
     premium: false,
     vote: false,
   },
+
   /**
    * @param {{ client: import("../../../Struct/Client"), message: import("discord.js").Message, player: import("kazagumo").Player }} ctx
    */
   run: async ({ client, message, player }) => {
     try {
       if (!player) {
-        return message.channel.send({
+        return message.reply({
           embeds: [
             new EmbedBuilder()
               .setDescription("🚫 **Tidak ada pemutar musik aktif ditemukan!**")
@@ -31,36 +37,42 @@ export default {
           ],
         });
       }
-
-      const isAutoplayEnabled = player.data.get("autoplay");
-      const newState = !isAutoplayEnabled;
+      
+      const current = player.data.get("autoplay") ?? false;
+      const newState = !current;
       player.data.set("autoplay", newState);
 
       const embed = new EmbedBuilder()
         .setTitle("🎶 Autoplay Mode")
         .setDescription(
           newState
-            ? "✅ **Fitur putar otomatis kini diaktifkan!** Bot akan terus memutar lagu-lagu serupa secara otomatis."
-            : "❌ **Fitur putar otomatis dinonaktifkan!** Antrian akan berhenti ketika selesai."
+            ? "✅ **Autoplay diaktifkan!** Bot akan memutar lagu serupa otomatis."
+            : "❌ **Autoplay dimatikan!** Musik berhenti saat antrian habis."
         )
         .setColor(newState ? "#00FF00" : "#FF0000")
         .setFooter({
-          text: `Dialihkan oleh ${message.author.username}`,
+          text: `Diubah oleh ${message.author.username}`,
           iconURL: message.author.displayAvatarURL(),
         });
 
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
-          .setCustomId("autoplay_toggle")
+          .setCustomId("autoplay")
           .setLabel(newState ? "Matikan" : "Aktifkan")
-          .setStyle(newState ? 4 : 3)
+          .setStyle(
+            newState ? ButtonStyle.Danger : ButtonStyle.Success
+          )
       );
 
-      message.channel.send({ embeds: [embed], components: [row] });
+      return message.reply({
+        embeds: [embed],
+        components: [row],
+      });
+
     } catch (error) {
       console.error(error);
-      message.channel.send({
-        content: "⚠️ **Terjadi kesalahan saat mengaktifkan Autoplay!**",
+      return message.reply({
+        content: "⚠️ **Terjadi kesalahan saat mengubah Autoplay!**",
       });
     }
   },
