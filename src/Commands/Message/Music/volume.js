@@ -14,13 +14,10 @@ export default {
       playing: true,
       active: true,
     },
-    premium: false,
+    premium: true,
     vote: false,
   },
 
-  /**
-   * @param {{ client: import("../../../Struct/Client"), message: import("discord.js").Message, args: string[], player: import("kazagumo").Player }}
-   */
   run: async ({ client, message, args, player }) => {
     if (!player) {
       return message.reply({
@@ -34,15 +31,20 @@ export default {
       });
     }
 
-    const currentVolume = player.volume * 100;
+    const safeVolume = (percent) => {
+      // percent 0–200
+      // 100% = 1.0, 0% = 0.5 (minimal terdengar), 200% = 2.0
+      return Math.min(2.0, Math.max(0.5, 0.5 + (percent / 200)));
+    };
+
+    let currentVolume = Math.round(player.volume * 100);
+    if (currentVolume < 5) currentVolume = 5;
 
     if (!args[0]) {
       const embed = new EmbedBuilder()
         .setColor(client.settings.COLOR)
         .setTitle("🔊 Volume Control")
-        .setDescription(
-          `🎵 **Volume Saat Ini:** \`${currentVolume}%\`\n📢 *Gunakan tombol di bawah untuk mengatur!*`
-        );
+        .setDescription(`🎵 **Volume Saat Ini:** \`${currentVolume}%\``);
 
       const row = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
@@ -70,22 +72,32 @@ export default {
       collector.on("collect", async (button) => {
         if (!player) return;
 
-        let newVolume = player.volume * 100;
         if (button.customId === "volumedown")
-          newVolume = Math.max(0, newVolume - 10);
+          currentVolume = Math.max(5, currentVolume - 10);
         if (button.customId === "volumeup")
-          newVolume = Math.min(200, newVolume + 10);
+          currentVolume = Math.min(200, currentVolume + 10);
 
-        player.setVolume(newVolume / 100);
+        player.setVolume(safeVolume(currentVolume));
 
-        embed.setDescription(`🎵 **Volume Saat Ini:** \`${newVolume}%\``);
-        await button.update({ embeds: [embed], components: [row] });
+        const newEmbed = new EmbedBuilder()
+          .setColor(client.settings.COLOR)
+          .setTitle("🔊 Volume Control")
+          .setDescription(`🎵 **Volume Saat Ini:** \`${currentVolume}%\``);
+
+        await button.update({ embeds: [newEmbed], components: [row] });
+      });
+
+      collector.on("end", async () => {
+        const disabledRow = new ActionRowBuilder().addComponents(
+          row.components.map((btn) => btn.setDisabled(true))
+        );
+        await msg.edit({ components: [disabledRow] });
       });
 
       return;
     }
 
-    const volume = parseInt(args[0]);
+    let volume = parseInt(args[0]);
     if (isNaN(volume) || volume < 1 || volume > 200) {
       return message.reply({
         embeds: [
@@ -98,24 +110,16 @@ export default {
       });
     }
 
-    if (currentVolume === volume) {
-      return message.reply({
-        embeds: [
-          new EmbedBuilder()
-            .setColor(client.settings.COLOR)
-            .setDescription(`⚠️ **Volume sudah diatur ke** \`${volume}%\`!`),
-        ],
-      });
-    }
-
-    player.setVolume(volume / 100);
+    if (volume < 5) volume = 5;
+    currentVolume = volume;
+    player.setVolume(safeVolume(currentVolume));
 
     return message.reply({
       embeds: [
         new EmbedBuilder()
           .setColor(client.settings.COLOR)
           .setTitle("🔊 Volume Updated!")
-          .setDescription(`🎶 **Volume Baru:** \`${volume}%\``),
+          .setDescription(`🎶 **Volume Baru:** \`${currentVolume}%\``),
       ],
     });
   },
