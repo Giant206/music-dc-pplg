@@ -38,8 +38,8 @@ export default async (client, message) => {
     }
   };
   ServerData = await ServerData();
-  let { prefix } = ServerData;
-  if (prefix) prefix = Config.PREFIX;
+    let prefix = ServerData.prefix || Config.PREFIX;
+
 
   const permissions = {
     userExternalEmoji: PermissionsBitField.Flags.UseExternalEmojis,
@@ -130,8 +130,8 @@ Jenis \`-help\` untuk mendapatkan semua perintah, lihat menu bantuan.`
     if (noprefix && !message.content.startsWith(prefix))
       //noprefix
       prefix = "";
-  const escapeRegex = (newprefix) => {
-    return newprefix.replace(/[.*+?^${}()|[\]\\]/g, `\\$&`);
+  const escapeRegex = (newprefix = "") => {
+    return String(newprefix).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   };
   const mentionprefix = new RegExp(
     `^(<@!?${client.user.id}>|${escapeRegex(prefix)})`
