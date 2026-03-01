@@ -17,12 +17,13 @@
       auth: "https://discord.gg/mjS5J2K3ep",
       secure: true,
     },
-    // {
-    //   name: "Node 2",
-    //   url: "lava-all.ajieblogs.eu.org:443",
-    //   auth: "https://dsc.gg/ajidevserver",
-    //   secure: true,
-    // },
+
+    {
+      name: "Node 1",
+      url: "lava-v3.ajieblogs.eu.org:443",
+      auth: "https://dsc.gg/ajidevserver",
+      secure: true,
+    },
   ],
   SpotifyID: "e6f84fbec2b44a77bf35a20c5ffa54b8",
   SpotifySecret: "498f461b962443cfaf9539c610e2ea81",
