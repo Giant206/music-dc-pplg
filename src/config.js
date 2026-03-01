@@ -19,7 +19,7 @@
     },
 
     {
-      name: "Node 1",
+      name: "Node 2",
       url: "lava-v3.ajieblogs.eu.org:443",
       auth: "https://dsc.gg/ajidevserver",
       secure: true,
