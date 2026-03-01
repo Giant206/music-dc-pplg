@@ -13,8 +13,8 @@
   NODES: [
     {
       name: "Node 1",
-      url: "lava-v3.ajieblogs.eu.org:443",
-      auth: "https://dsc.gg/ajidevserver",
+      url: "lava-v3.millohost.my.id:443",
+      auth: "https://discord.gg/mjS5J2K3ep",
       secure: true,
     },
     // {
