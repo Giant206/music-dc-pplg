@@ -1,4 +1,4 @@
-export default {
+   export default {
   TOKEN:
     "TOKEN_BOT_DISCORD_LU",
   MONGO:

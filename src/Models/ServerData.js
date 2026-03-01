@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 const ServerSchema = new Schema({
   serverID: { type: String },
-  prefix: { type: String, default: "-" },
+  prefix: { type: String, default: "p!" },
   autoplay: { type: Boolean, default: false },
   botChannel: { type: String },
 });

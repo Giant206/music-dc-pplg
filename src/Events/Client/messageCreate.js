@@ -106,7 +106,7 @@ Jenis \`-help\` untuk mendapatkan semua perintah, lihat menu bantuan.`
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setLabel("Support Server")
-        .setURL("belum ada ya")
+        .setURL("https://wa.me/6285171648088/")
         .setStyle(client.Buttons.link),
 
       new ButtonBuilder()
