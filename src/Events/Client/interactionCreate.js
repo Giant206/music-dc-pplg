@@ -42,12 +42,14 @@ export default async (client, interaction) => {
   }
   if (interaction.isButton()) {
     const player = await client.kazagumo.players.get(interaction.guild.id);
-    let requester;
-    if (player)
-      requester = player?.queue.previous
-        ? player.queue.previous.requester
-        : player.queue.current.requester;
-    if (!player) requester = client.user;
+    let requester = client.user;
+    if (player) {
+      if (player.queue.previous && player.queue.previous.requester) {
+        requester = player.queue.previous.requester;
+      } else if (player.queue.current && player.queue.current.requester) {
+        requester = player.queue.current.requester;
+      }
+    }
     const notInvc = new EmbedBuilder();
     notInvc.setColor(client.settings.COLOR);
     notInvc.setDescription(
@@ -63,7 +65,7 @@ export default async (client, interaction) => {
     const requesterEmebd = new EmbedBuilder();
     requesterEmebd.setColor(client.settings.COLOR);
     requesterEmebd.setDescription(
-      `\`\`\`diff\n-Lagu yang sedang diputar diminta oleh ${requester.username}. Jadi Anda tidak dapat menggunakan tombol ini!\`\`\``
+      `\`\`\`diff\n-Lagu yang sedang diputar diminta oleh ${requester?.username || "Tidak diketahui"}. Jadi Anda tidak dapat menggunakan tombol ini!\`\`\``
     );
     if (interaction.customId === "skip") {
       if (!player) return interaction.message.delete();
@@ -81,6 +83,7 @@ export default async (client, interaction) => {
       )
         return interaction.reply({ embeds: [samevc], ephemeral: true });
       if (
+        player.queue.current &&
         interaction.user.id !== player.queue.current.requester.id &&
         interaction.user.id !== client.settings.owner
       )
@@ -113,6 +116,7 @@ export default async (client, interaction) => {
       )
         return interaction.reply({ embeds: [samevc], ephemeral: true });
       if (
+        player.queue.current &&
         interaction.user.id !== player.queue.current.requester.id &&
         interaction.user.id !== client.settings.owner
       )
@@ -136,6 +140,7 @@ export default async (client, interaction) => {
       )
         return interaction.reply({ embeds: [samevc], ephemeral: true });
       if (
+        player.queue.current &&
         interaction.user.id !== player.queue.current.requester.id &&
         interaction.user.id !== client.settings.owner
       )
@@ -169,6 +174,7 @@ export default async (client, interaction) => {
       )
         return interaction.reply({ embeds: [samevc], ephemeral: true });
       if (
+        player.queue.current &&
         interaction.user.id !== player.queue.current.requester.id &&
         interaction.user.id !== client.settings.owner
       )
@@ -181,29 +187,24 @@ export default async (client, interaction) => {
         .setLabel("Settings");
       const prev = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
-        //.setEmoji(`1177656047985504351`)
         .setCustomId("prev")
         .setLabel("Previous")
         .setDisabled(!player.queue.previous ? true : false);
       const pauseandres = new ButtonBuilder()
         .setStyle(player.playing ? client.Buttons.grey : client.Buttons.green)
         .setCustomId("pauseandres")
-        //.setEmoji(`1177594147297820712`)
         .setLabel(player.playing ? "Pause" : "Resume");
       const skip = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
-        //.setEmoji(`1177656050590154812`)
         .setCustomId("skip")
         .setLabel("Skip");
       const stop = new ButtonBuilder()
         .setStyle(client.Buttons.red)
         .setCustomId("stop")
-        //.setEmoji(`1177656045099827290`)
         .setLabel("Stop");
       const loop = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
         .setCustomId("loop")
-        //.setEmoji(`1177656045099827290`)
         .setLabel(
           `Loop - ${
             player.loop == "none"
@@ -216,7 +217,6 @@ export default async (client, interaction) => {
       const shuffle = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
         .setCustomId("shuffle")
-        //.setEmoji(`1177656045099827290`)
         .setLabel("Shuffle");
       const row = new ActionRowBuilder().addComponents(
         pauseandres,
@@ -231,12 +231,10 @@ export default async (client, interaction) => {
           .messages.fetch(player.data.get("nowplaying"));
         msg.edit({ components: [row] });
       } catch (e) {
-        cosole.log(e);
+        console.log(e);
       }
       musicEmbd.setDescription(
-        `Track sekarang  ${
-          player.paused ? "```diff\n-Dijeda```" : "```diff\n+Dilanjutkan```"
-        }`
+        player.paused ? "Track sekarang dijeda" : "Track sekarang dilanjutkan"
       );
 
       return interaction.reply({ embeds: [musicEmbd], ephemeral: true });
@@ -256,6 +254,7 @@ export default async (client, interaction) => {
       )
         return interaction.reply({ embeds: [samevc], ephemeral: true });
       if (
+        player.queue.current &&
         interaction.user.id !== player.queue.current.requester.id &&
         interaction.user.id !== client.settings.owner
       )
@@ -267,29 +266,24 @@ export default async (client, interaction) => {
         .setLabel("Settings");
       const prev = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
-        //.setEmoji(`1177656047985504351`)
         .setCustomId("prev")
         .setLabel("Previous")
         .setDisabled(!player.queue.previous ? true : false);
       const pauseandres = new ButtonBuilder()
         .setStyle(player.playing ? client.Buttons.grey : client.Buttons.green)
         .setCustomId("pauseandres")
-        //.setEmoji(`1177594147297820712`)
         .setLabel(player.playing ? "Pause" : "Resume");
       const skip = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
-        //.setEmoji(`1177656050590154812`)
         .setCustomId("skip")
         .setLabel("Skip");
       const stop = new ButtonBuilder()
         .setStyle(client.Buttons.red)
         .setCustomId("stop")
-        //.setEmoji(`1177656045099827290`)
         .setLabel("Stop");
       const loop = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
         .setCustomId("loop")
-        //.setEmoji(`1177656045099827290`)
         .setLabel(
           `Loop - ${
             player.loop == "none"
@@ -302,7 +296,6 @@ export default async (client, interaction) => {
       const shuffle = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
         .setCustomId("shuffle")
-        //.setEmoji(`1177656045099827290`)
         .setLabel("Shuffle");
       const row = new ActionRowBuilder().addComponents(
         pauseandres,
@@ -330,6 +323,7 @@ export default async (client, interaction) => {
       )
         return interaction.reply({ embeds: [samevc], ephemeral: true });
       if (
+        player.queue.current &&
         interaction.user.id !== player.queue.current.requester.id &&
         interaction.user.id !== client.settings.owner
       )
@@ -350,29 +344,24 @@ export default async (client, interaction) => {
         .setLabel("Settings");
       const prev = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
-        //.setEmoji(`1177656047985504351`)
         .setCustomId("prev")
         .setLabel("Previous")
         .setDisabled(!player.queue.previous ? true : false);
       const pauseandres = new ButtonBuilder()
         .setStyle(player.playing ? client.Buttons.grey : client.Buttons.green)
         .setCustomId("pauseandres")
-        //.setEmoji(`1177594147297820712`)
         .setLabel(player.playing ? "Pause" : "Resume");
       const skip = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
-        //.setEmoji(`1177656050590154812`)
         .setCustomId("skip")
         .setLabel("Skip");
       const stop = new ButtonBuilder()
         .setStyle(client.Buttons.red)
         .setCustomId("stop")
-        //.setEmoji(`1177656045099827290`)
         .setLabel("Stop");
       const loop = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
         .setCustomId("loop")
-        //.setEmoji(`1177656045099827290`)
         .setLabel(
           `Loop - ${
             player.loop == "none"
@@ -385,7 +374,6 @@ export default async (client, interaction) => {
       const shuffle = new ButtonBuilder()
         .setStyle(client.Buttons.grey)
         .setCustomId("shuffle")
-        //.setEmoji(`1177656045099827290`)
         .setLabel("Shuffle");
       const row = new ActionRowBuilder().addComponents(
         pauseandres,
@@ -415,6 +403,7 @@ export default async (client, interaction) => {
       return interaction.reply({ embeds: [samevc], ephemeral: true });
 
     if (
+      player.queue.current &&
       interaction.user.id !== player.queue.current.requester.id &&
       interaction.user.id !== client.settings.owner
     )
@@ -467,6 +456,7 @@ export default async (client, interaction) => {
       )
         return interaction.reply({ embeds: [samevc], ephemeral: true });
       if (
+        player.queue.current &&
         interaction.user.id !== player.queue.current.requester.id &&
         interaction.user.id !== client.settings.owner
       )
@@ -498,6 +488,7 @@ export default async (client, interaction) => {
       )
         return interaction.reply({ embeds: [samevc], ephemeral: true });
       if (
+        player.queue.current &&
         interaction.user.id !== player.queue.current.requester.id &&
         interaction.user.id !== client.settings.owner
       )
@@ -529,6 +520,7 @@ export default async (client, interaction) => {
       )
         return interaction.reply({ embeds: [samevc], ephemeral: true });
       if (
+        player.queue.current &&
         interaction.user.id !== player.queue.current.requester.id &&
         interaction.user.id !== client.settings.owner
       )
