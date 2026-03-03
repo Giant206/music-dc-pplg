@@ -1,6 +1,6 @@
    export default {
   TOKEN:
-    "MTQ3MjYxNTM0NTQwMjU0NDEzOA.GM5j1G.xCBBqj4L4euxpKIF7XWnql5aRGKj-4xg4rROMI",
+    "",
   MONGO:
     "mongodb+srv://GianDatabase:Uvu06oN0QeYTFoGm@giandatabase.60zyiyh.mongodb.net/?appName=GianDatabase",
   OWNER: ["1186985440759267351"],

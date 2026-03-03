@@ -11,7 +11,7 @@ const manager = new ClusterManager(`./src/cold.js`, {
   mode: "process",
   token:
     process.env.TOKEN ||
-    "MTQ3MjYxNTM0NTQwMjU0NDEzOA.GM5j1G.xCBBqj4L4euxpKIF7XWnql5aRGKj-4xg4rROMI", // mau pakai di .env juga gapapa, yang penting tokennya jangan di publish ya :v
+    "", // mau pakai di .env juga gapapa, yang penting tokennya jangan di publish ya :v
 });
 manager.on("clusterCreate", (cluster) =>
   console.log(`Launched Cluster ${cluster.id}`)
